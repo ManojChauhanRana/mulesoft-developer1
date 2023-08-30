@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c2209cb1-aa00-43c5-bab9-772edc77a5a6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="e8749af2-25ca-4e37-af47-f2d7ceae7002" >
+		<salesforce:basic-connection username="chauhanmanoj16358-3ujl@force.com" password="Chauhanrana@123" securityToken="5x0V0yGwW0vcAFwsHLJrHzSZ" />
+	</salesforce:sfdc-config>
+	<flow name="salesforceconnectorFlow" doc:id="d102d9f6-845c-4d88-8fd5-54c3dcb7eb9b" >
+		<http:listener doc:name="Listener" doc:id="cd261ef5-ab68-4697-a8bc-520f5aac958f" config-ref="HTTP_Listener_config" path="/test1"/>
+		<salesforce:create doc:name="Create" doc:id="72428f06-49fa-44b3-8cdb-0e1478bde20f" config-ref="Salesforce_Config" type="accounts"/>
+	</flow>
+	<flow name="mainflow" doc:id="ad5164b3-27ca-4ded-9faf-ed9f67de0182" >
+		<http:listener doc:name="Listener" doc:id="dd48c304-7f7f-49f4-bf93-49b5ea2e5c2b" config-ref="HTTP_Listener_config" path="/test"/>
+		<validation:is-number doc:name="Is number" doc:id="4999c859-32d2-4607-978c-805add05e6c8" value="string" numberType="INTEGER"/>
+		<flow-ref doc:name="Flow Reference" doc:id="85c333cc-6d9e-4118-b074-c897a0f877cb" name="private"/>
+		<set-payload value="success main flow" doc:name="success main flow6" doc:id="663aeb90-068a-4487-827c-cd6f385dad6f" />
+	</flow>
+	<flow name="private" doc:id="2193033c-4631-4f62-a6d0-9930f3866360" >
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="88d18352-6361-4642-b175-46d7a8e190af" />
+		<validation:is-number numberType="INTEGER" doc:id="5b2f5353-edc6-42e2-87ae-3bc89ebf9efa" value="#[payload]" message="validate payload is intiger"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="742de1a9-9a20-42c2-9712-2e8c18a863ce" >
+				<set-payload value="error private flow" doc:name="error private flow" doc:id="6a193240-662e-4620-9923-8609268dc64a" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
